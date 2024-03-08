@@ -9,3 +9,11 @@ Recomenda-se preencher as colunas "Quantidade" e "Valor da Operação" que não 
 
 Instale a única dependência: pandas, usando o comando `pip install pandas`.
 Por fim, execute o código.
+
+
+
+
+# Docker
+
+docker build -t calculadora-lucro-trade .
+docker run calculadora-lucro-trade

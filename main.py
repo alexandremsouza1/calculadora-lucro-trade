@@ -6,9 +6,25 @@
         Por isso, recomenda-se preencher os dados faltantes.
 """
 import pandas as pd
+import os
+import tempfile
+import glob
 
 
-EXCEL_PATH = "path/to/b3/excel"  # Planilha movimentações da B3
+# Obtém o caminho do diretório atual do script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Checa se o arquivo movimentacao.xlsx existe
+if not os.path.exists(os.path.join(script_dir, "files", "movimentacao.xlsx")):
+    print("Arquivo movimentacao.xlsx não encontrado.")
+    exit()
+
+EXCEL_PATH = os.path.join(script_dir, "files", "movimentacao.xlsx")
+
+# Altera o diretório de trabalho para o diretório temporário
+os.chdir(tempfile.gettempdir())
+
+# Carrega os dados do Excel
 data = pd.read_excel(EXCEL_PATH)
 
 # Remove linhas que não possuem valor na coluna "Valor da Operação" ou "Quantidade"
@@ -22,7 +38,7 @@ data[["ticket", "trash"]] = data.Produto.str.split(' ', n=1, expand=True)
 data = data.drop(columns='trash')
 
 # Ordena por data
-data["Data"] = pd.to_datetime(data["Data"])
+data["Data"] = pd.to_datetime(data["Data"], format="%d/%m/%Y", dayfirst=True)
 data = data.sort_values(by=["Data"])
 
 # Obtem ativos operados

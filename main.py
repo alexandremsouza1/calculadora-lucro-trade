@@ -45,6 +45,8 @@ data = data.sort_values(by=["Data"])
 tickets = data["ticket"]
 tickets = tickets.to_list()
 tickets = list(set(tickets))
+lucro_total_day_trade = 0
+lucro_total_swing_trade = 0
 
 lucro_total = 0
 for ticket in tickets:
@@ -55,14 +57,18 @@ for ticket in tickets:
     qtd_acao_vendida = 0
     valor_total_compra = 0
     valor_total_venda = 0
+    dia_entrada = None
+    dia_saida = None
 
     for index, row in stock_data.iterrows():
         if row["Entrada/Saída"] == "Credito":
             qtd_acao_comprada += row["Quantidade"]
             valor_total_compra += row["Valor da Operação"]
+            dia_entrada = row["Data"]
         elif row["Entrada/Saída"] == "Debito":
             qtd_acao_vendida += row["Quantidade"]
             valor_total_venda += row["Valor da Operação"]
+            dia_saida = row["Data"]
         else:
             continue
 
@@ -79,6 +85,10 @@ for ticket in tickets:
         debito = qtd_calculo * pm_venda        
 
         lucro = debito - credito
+        if dia_entrada == dia_saida:
+            lucro_total_day_trade += lucro
+        else:
+            lucro_total_swing_trade += lucro
 
         print(f"{ticket}: {lucro}")
         lucro_total += lucro
@@ -87,3 +97,5 @@ first_date = str(data['Data'].iloc[0]).split(" ")[0]
 last_date = str(data['Data'].iloc[-1]).split(" ")[0]
 from_to = f"{first_date} a {last_date}"
 print(f"Lucro total obtido no período ({from_to}): {lucro_total:.2f}")
+print(f"Lucro total obtido no Day Trade: {lucro_total_day_trade:.2f}")
+print(f"Lucro total obtido no Swing Trade: {lucro_total_swing_trade:.2f}")

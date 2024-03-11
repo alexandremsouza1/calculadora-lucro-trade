@@ -14,12 +14,14 @@ import glob
 # Obtém o caminho do diretório atual do script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
+name_file = "movimentacao-2024-03-11-18-55-30.xlsx";
+
 # Checa se o arquivo movimentacao.xlsx existe
-if not os.path.exists(os.path.join(script_dir, "files", "movimentacao.xlsx")):
+if not os.path.exists(os.path.join(script_dir, "files", name_file)):
     print("Arquivo movimentacao.xlsx não encontrado.")
     exit()
 
-EXCEL_PATH = os.path.join(script_dir, "files", "movimentacao.xlsx")
+EXCEL_PATH = os.path.join(script_dir, "files", name_file)
 
 # Altera o diretório de trabalho para o diretório temporário
 os.chdir(tempfile.gettempdir())

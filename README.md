@@ -17,3 +17,10 @@ Por fim, execute o código.
 
 docker build -t calculadora-lucro-trade .
 docker run calculadora-lucro-trade
+
+
+
+https://www.investidor.b3.com.br/extrato/negociacao
+
+
+Tem que ser o negociação

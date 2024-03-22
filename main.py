@@ -27,7 +27,13 @@ def importar_negociacoes():
     df = merge_operacoes(df, df_importadas)
 
     calculo_ir = CalculoIr(df=df)
-    calculo_ir.calcula()
+    result = calculo_ir.calcula()
+    
+    if os.path.exists(os.path.join(script_dir, "files", "result.xlsx")):
+        os.remove(os.path.join(script_dir, "files", "result.xlsx"))
+    result.to_excel(os.path.join(script_dir, "files", "result.xlsx"))
+    print('Resultado gravado em result.xlsx')
+
     
 
 importar_negociacoes()

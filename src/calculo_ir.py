@@ -19,31 +19,62 @@ class CalculoIr():
 
     def calcula(self):
         print('Iniciando cálculo...')
-        
+        resultado = []
+
         movimentacao_group = self.df.groupby('ticker')
 
         for ticker, item_movimentacao_group in movimentacao_group:
-            compra = self._retorna_item_grupo_por_operacao(item_movimentacao_group, 'Compra')
-            venda = self._retorna_item_grupo_por_operacao(item_movimentacao_group, 'Venda')
             
-            if compra is None or venda is None:
-                print(f"Erro: Não foi encontrada uma compra ou uma venda para o ticker {ticker}")
-                continue
+            transacoes = self.__retorna_transacoes(item_movimentacao_group)
             
-            compra_preco = compra['valor']
-            compra_data = compra['data']
-            lucro = round(venda['valor'] - compra_preco, 2)
-            is_day_trade = venda['data'] == compra_data
-
-            if is_day_trade:
-                print(f"Day trade de {venda['qtd']} ações de {ticker}: Lucro/Prejuízo: {lucro} : Calculo {venda['valor']} - {compra_preco}")
-            else:  # Swing trade
-                print(f"Swing trade de {venda['qtd']} ações de {ticker}: Lucro/Prejuízo: {lucro} : Calculo {venda['valor']} - {compra_preco}")
-
+            for transacao in transacoes:
+                compra = transacao['compra']
+                venda = transacao['venda']
+            
+                if compra is None or venda is None:
+                    print(f"Erro: Não foi encontrada uma compra ou uma venda para o ticker {ticker}")
+                    continue
+                
+                compra_preco = compra['valor']
+                compra_data = compra['data']
+                lucro = round(venda['valor'] - compra_preco, 2)
+                is_day_trade = venda['data'] == compra_data
+                operacao = 'Day trade' if is_day_trade else 'Swing trade'
+                alerta =  lucro / compra_preco * 100
+                resultado.append({
+                    'ticker': ticker,
+                    'compra_data': compra_data,
+                    'venda_data': venda['data'],
+                    'compra_preco': compra_preco,
+                    'venda_preco': venda['valor'],
+                    'lucro': lucro,
+                    'operacao': operacao,
+                    'alerta': alerta
+                })
         print('Cálculo concluído.')
-        return self.df
+        return pd.DataFrame(resultado)
     
+    def __retorna_transacoes(self, grupo):
+        transacoes = []
+        grupo = grupo.sort_values(by='data')
+        compra = None
+        venda = None
+        for _, data in grupo.iterrows():
+            if data['operacao'] == 'Compra':
+                compra = data
+            if data['operacao'] == 'Venda':
+                venda = data
+            if compra is not None and venda is not None:
+                transacoes.append({
+                    'compra': compra,
+                    'venda': venda
+                })
+                compra = None
+                venda = None
+        return transacoes
+
     def _retorna_item_grupo_por_operacao(self, grupo, operacao):
+        grupo = grupo.sort_values(by='data')
         for _, data in grupo.iterrows():
             if data['operacao'] == operacao:
                 return data
